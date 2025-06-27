@@ -186,11 +186,16 @@ export default class SuperComboboxCPE extends LightningElement {
         
         try {
             const fields = await getPicklistFields({ objectApiName: this.selectedObject });
-            // Filter to include both single-select and multi-select picklist fields
-            this.fieldOptions = (fields || []).filter(field => 
-                field.isPicklist === true || field.isMultiSelect === true
-            );
-            console.log('Loaded picklist field options from Apex:', this.fieldOptions.length);
+            console.log('All fields from Apex:', fields);
+            
+            // Filter to only show single-select picklist fields (not multi-select)
+            this.fieldOptions = (fields || []).filter(field => {
+                console.log(`Field: ${field.label}, isMultiSelect: ${field.isMultiSelect}`);
+                return field.isMultiSelect === false;
+            });
+            
+            console.log('Filtered single-select picklist field options:', this.fieldOptions);
+            console.log('Number of single-select fields:', this.fieldOptions.length);
             
             // Set the field selection if it's valid
             if (savedFieldSelection) {

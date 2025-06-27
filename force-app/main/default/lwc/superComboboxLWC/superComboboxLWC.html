@@ -15,26 +15,72 @@
             
             <template if:true={showCustomUI}>
                 <div class="slds-form-element">
-                    <lightning-combobox
-                        name="customCombobox"
-                        label={cardTitle}
-                        value={selectedOption}
-                        placeholder={placeholder}
-                        options={picklistOptionsWithHelp}
-                        onchange={handleSelectionChange}
-                        required={isRequired}
-                    ></lightning-combobox>
-                    
-                    <template if:true={hasCurrentHelpText}>
-                        <div class="slds-form-element__help slds-m-top_x-small">
-                            <lightning-icon 
-                                icon-name="utility:info" 
-                                size="x-small"
-                                class="slds-m-right_x-small"
-                            ></lightning-icon>
-                            {currentHelpText}
+                    <label class="slds-form-element__label" for="custom-combobox">
+                        <template if:true={isRequired}>
+                            <abbr class="slds-required" title="required">*</abbr>
+                        </template>
+                        {cardTitle}
+                    </label>
+                    <div class="slds-form-element__control">
+                        <div class="slds-combobox_container">
+                            <div class={comboboxClass} 
+                                 aria-expanded={isDropdownOpen} 
+                                 aria-haspopup="listbox" 
+                                 role="combobox">
+                                <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" onclick={toggleDropdown}>
+                                    <input type="text" 
+                                           class="slds-input slds-combobox__input" 
+                                           id="custom-combobox"
+                                           aria-controls="listbox-options"
+                                           autocomplete="off"
+                                           role="textbox"
+                                           placeholder={placeholder}
+                                           value={selectedLabel}
+                                           readonly="readonly"
+                                    />
+                                    <span class="slds-icon_container slds-icon-utility-down slds-input__icon slds-input__icon_right">
+                                        <lightning-icon 
+                                            icon-name="utility:down" 
+                                            size="x-small"
+                                            alternative-text="Toggle dropdown">
+                                        </lightning-icon>
+                                    </span>
+                                </div>
+                                <template if:true={isDropdownOpen}>
+                                    <div id="listbox-options" 
+                                         class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid" 
+                                         role="listbox">
+                                    <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                                        <template for:each={picklistOptionsWithHelp} for:item="option">
+                                            <li key={option.value} 
+                                                role="presentation" 
+                                                class="slds-listbox__item"
+                                                onclick={handleOptionSelect}
+                                                data-value={option.value}>
+                                                <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small" 
+                                                     role="option">
+                                                    <span class="slds-media__body">
+                                                        <span class="slds-truncate" title={option.label}>
+                                                            {option.label}
+                                                        </span>
+                                                    </span>
+                                                    <template if:true={option.hasHelp}>
+                                                        <span class="slds-media__figure slds-media__figure_reverse">
+                                                            <lightning-helptext 
+                                                                content={option.helpText}
+                                                                icon-name="utility:info">
+                                                            </lightning-helptext>
+                                                        </span>
+                                                    </template>
+                                                </div>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                    </div>
+                                </template>
+                            </div>
                         </div>
-                    </template>
+                    </div>
                 </div>
             </template>
         </div>
