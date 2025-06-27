@@ -3,7 +3,7 @@ import { getObjectInfo, getPicklistValuesByRecordType } from 'lightning/uiObject
 import getObjectOptions from '@salesforce/apex/SuperListBoxController.getObjectOptions';
 import getPicklistFields from '@salesforce/apex/SuperListBoxController.getPicklistFields';
 
-export default class SuperListBoxCPE extends LightningElement {
+export default class SuperComboboxCPE extends LightningElement {
     // Flow Builder interfaces
     _builderContext = {};
     _inputVariables = [];
@@ -20,9 +20,9 @@ export default class SuperListBoxCPE extends LightningElement {
     selectedObject;
     selectedField;
     selectedRecordTypeId;
-    cardTitle = 'Select Values';
+    cardTitle = 'Select Value';
     isRequired = false;
-    initialSelectedValues = [];
+    initialSelectedValue = '';
     
     effectiveRecordTypeId = null;
     _picklistData = null; // Store picklist data from wire
@@ -99,13 +99,13 @@ export default class SuperListBoxCPE extends LightningElement {
                         this.selectedRecordTypeId = variable.value;
                         break;
                     case 'cardTitle':
-                        this.cardTitle = variable.value || 'Select Values';
+                        this.cardTitle = variable.value || 'Select Value';
                         break;
                     case 'isRequired':
                         this.isRequired = variable.value === 'true' || variable.value === true;
                         break;
-                    case 'initialSelectedValues':
-                        this.initialSelectedValues = variable.value || [];
+                    case 'initialSelectedValue':
+                        this.initialSelectedValue = variable.value || '';
                         break;
                     case 'picklistDefinitions':
                         try {
@@ -186,9 +186,11 @@ export default class SuperListBoxCPE extends LightningElement {
         
         try {
             const fields = await getPicklistFields({ objectApiName: this.selectedObject });
-            // Filter to only show multi-select picklist fields
-            this.fieldOptions = (fields || []).filter(field => field.isMultiSelect === true);
-            console.log('Loaded multi-select field options from Apex:', this.fieldOptions.length);
+            // Filter to include both single-select and multi-select picklist fields
+            this.fieldOptions = (fields || []).filter(field => 
+                field.isPicklist === true || field.isMultiSelect === true
+            );
+            console.log('Loaded picklist field options from Apex:', this.fieldOptions.length);
             
             // Set the field selection if it's valid
             if (savedFieldSelection) {
@@ -368,9 +370,8 @@ export default class SuperListBoxCPE extends LightningElement {
         switch (name) {
             case 'isRequired':
                 return 'Boolean';
-            case 'initialSelectedValues':
-            case 'selectedAsCollection':
-                return 'String[]';
+            case 'initialSelectedValue':
+                return 'String';
             default:
                 return 'String';
         }

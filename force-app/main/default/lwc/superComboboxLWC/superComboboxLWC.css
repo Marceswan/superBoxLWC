@@ -1,0 +1,68 @@
+/* Help Text Container Styles */
+.help-text-container {
+    padding: 0.5rem 0;
+    margin-top: 0.25rem;
+}
+
+.help-text {
+    font-size: 0.75rem;
+    line-height: 1.25;
+    color: #3e3e3c;
+    display: flex;
+    align-items: flex-start;
+}
+
+/* Help Icon Styles */
+.help-icon {
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Custom Combobox Container */
+.custom-combobox {
+    position: relative;
+}
+
+/* Error Message Styling */
+.slds-form-element__help {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    color: #c23934;
+}
+
+/* Focus States */
+.custom-combobox:focus-within .slds-combobox__input {
+    box-shadow: 0 0 3px #0070d2;
+    border-color: #0070d2;
+}
+
+/* Dropdown Menu Enhancement */
+.slds-dropdown {
+    max-height: 15rem;
+    overflow-y: auto;
+}
+
+/* Selected Option Highlight */
+.slds-listbox__option[aria-selected="true"] {
+    background-color: #f4f6f9;
+}
+
+/* Hover State for Options */
+.slds-listbox__option:hover {
+    background-color: #f4f6f9;
+    cursor: pointer;
+}
+
+/* Disabled State */
+.custom-combobox.slds-is-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* Required Indicator */
+.slds-required {
+    color: #c23934;
+    margin-left: 0.125rem;
+}

@@ -2,7 +2,7 @@ import { LightningElement, api, track, wire } from 'lwc';
 import { getObjectInfo, getPicklistValuesByRecordType } from 'lightning/uiObjectInfoApi';
 import { FlowAttributeChangeEvent } from 'lightning/flowSupport';
 
-export default class SuperListBoxLWC extends LightningElement {
+export default class SuperComboboxLWC extends LightningElement {
     @api recordTypeId; // Optional Input: Record Type ID
     @api isRequired = false;
     
@@ -12,7 +12,7 @@ export default class SuperListBoxLWC extends LightningElement {
         return this._picklistDefinitions;
     }
     set picklistDefinitions(value) {
-        console.log('SuperListBoxLWC - picklistDefinitions setter called with:', value);
+        console.log('SuperComboboxLWC - picklistDefinitions setter called with:', value);
         this._picklistDefinitions = value;
         this.parseDefinitions();
         
@@ -29,7 +29,7 @@ export default class SuperListBoxLWC extends LightningElement {
         // Increment key to force complete re-render
         this.componentKey++;
         
-        console.log('SuperListBoxLWC - Updated showCustomUI:', this.showCustomUI);
+        console.log('SuperComboboxLWC - Updated showCustomUI:', this.showCustomUI);
     }
 
     _objectApiName;
@@ -52,13 +52,13 @@ export default class SuperListBoxLWC extends LightningElement {
         this.updatePicklistParams();
     }
 
-    @api initialSelectedValues; // New Input: Pre-selected values
-    @api selectedAsString; // Output: Selected values as string
-    @api selectedAsCollection; // Output: Selected values as collection
-    @api cardTitle = 'Select Values';
+    @api initialSelectedValue; // New Input: Pre-selected value (single)
+    @api selectedValue; // Output: Selected value as string
+    @api cardTitle = 'Select Value';
+    @api placeholder = 'Choose a value';
 
-    @track picklistOptions = []; // Options for dual listbox
-    @track selectedValues = []; // Holds the selected values
+    @track picklistOptions = []; // Options for combobox
+    @track selectedOption = ''; // Holds the selected value
     @track picklistOptionsWithHelp = []; // Options with help text
     @track parsedDefinitions = {}; // Parsed custom definitions
     @track componentKey = 0; // Key to force re-render
@@ -68,7 +68,7 @@ export default class SuperListBoxLWC extends LightningElement {
     @track picklistParams = {};
 
     connectedCallback() {
-        console.log('SuperListBoxLWC - connectedCallback', {
+        console.log('SuperComboboxLWC - connectedCallback', {
             objectApiName: this._objectApiName,
             fieldApiName: this._fieldApiName,
             picklistDefinitions: this._picklistDefinitions,
@@ -107,24 +107,24 @@ export default class SuperListBoxLWC extends LightningElement {
     // Fetch object info to get default record type if recordTypeId is not provided
     @wire(getObjectInfo, { objectApiName: '$_objectApiName' })
     objectInfo({ error, data }) {
-        console.log('SuperListBoxLWC - objectInfo wire called', {
+        console.log('SuperComboboxLWC - objectInfo wire called', {
             data: data,
             error: error,
             objectApiName: this._objectApiName
         });
         
         if (data) {
-            console.log('SuperListBoxLWC - Object Info Data:', data);
+            console.log('SuperComboboxLWC - Object Info Data:', data);
             this.effectiveRecordTypeId = this.recordTypeId || data.defaultRecordTypeId;
-            console.log('SuperListBoxLWC - Using Record Type ID:', this.effectiveRecordTypeId);
+            console.log('SuperComboboxLWC - Using Record Type ID:', this.effectiveRecordTypeId);
             this.updatePicklistParams();
         } else if (error) {
-            console.error('SuperListBoxLWC - Error fetching object info:', error);
+            console.error('SuperComboboxLWC - Error fetching object info:', error);
         }
     }
 
     updatePicklistParams() {
-        console.log('SuperListBoxLWC - updatePicklistParams', {
+        console.log('SuperComboboxLWC - updatePicklistParams', {
             effectiveRecordTypeId: this.effectiveRecordTypeId,
             objectApiName: this._objectApiName,
             fieldApiName: this._fieldApiName
@@ -135,13 +135,14 @@ export default class SuperListBoxLWC extends LightningElement {
                 objectApiName: this._objectApiName,
                 recordTypeId: this.effectiveRecordTypeId
             };
-            console.log('SuperListBoxLWC - picklistParams set:', this.picklistParams);
+            console.log('SuperComboboxLWC - picklistParams set:', this.picklistParams);
         }
     }
+    
     // Fetch picklist values for the given object and record type
     @wire(getPicklistValuesByRecordType, { objectApiName: '$_objectApiName', recordTypeId: '$effectiveRecordTypeId' })
     wiredPicklistValues({ error, data }) {
-        console.log('SuperListBoxLWC - wiredPicklistValues called', {
+        console.log('SuperComboboxLWC - wiredPicklistValues called', {
             data: data,
             error: error,
             fieldApiName: this._fieldApiName,
@@ -151,7 +152,7 @@ export default class SuperListBoxLWC extends LightningElement {
         if (data) {
             if (this._fieldApiName && data.picklistFieldValues && data.picklistFieldValues[this._fieldApiName]) {
                 const fieldData = data.picklistFieldValues[this._fieldApiName];
-                console.log('SuperListBoxLWC - Found field data:', fieldData);
+                console.log('SuperComboboxLWC - Found field data:', fieldData);
                 
                 this.picklistOptions = fieldData.values.map((item) => {
                     return { label: item.label, value: item.value };
@@ -176,19 +177,16 @@ export default class SuperListBoxLWC extends LightningElement {
                                      this.parsedDefinitions && 
                                      Object.keys(this.parsedDefinitions).length > 0);
                 
-                console.log('SuperListBoxLWC - picklistOptions:', this.picklistOptions);
-                console.log('SuperListBoxLWC - showCustomUI:', this.showCustomUI);
+                console.log('SuperComboboxLWC - picklistOptions:', this.picklistOptions);
+                console.log('SuperComboboxLWC - showCustomUI:', this.showCustomUI);
 
-                // Set selected values if initialSelectedValues are provided
-                if (this.initialSelectedValues && this.initialSelectedValues.length > 0) {
-                    this.selectedValues = [...this.initialSelectedValues];
-                    // Update outputs
-                    this.selectedAsString = this.selectedValues.join(';');
-                    this.selectedAsCollection = [...this.selectedValues];
+                // Set selected value if initialSelectedValue is provided
+                if (this.initialSelectedValue) {
+                    this.selectedOption = this.initialSelectedValue;
+                    this.selectedValue = this.initialSelectedValue;
 
-                    // Dispatch Flow Attribute Change Events
-                    this.dispatchFlowAttributeChangeEvent('selectedAsString', this.selectedAsString);
-                    this.dispatchFlowAttributeChangeEvent('selectedAsCollection', this.selectedAsCollection);
+                    // Dispatch Flow Attribute Change Event
+                    this.dispatchFlowAttributeChangeEvent('selectedValue', this.selectedValue);
                 }
             } else {
                 console.warn(`Field "${this._fieldApiName}" not found in picklistFieldValues.`);
@@ -198,15 +196,13 @@ export default class SuperListBoxLWC extends LightningElement {
         }
     }
 
-    // Handle selection change in the dual listbox
+    // Handle selection change in the combobox
     handleSelectionChange(event) {
-        this.selectedValues = event.detail.value;
-        this.selectedAsString = this.selectedValues.join(';');
-        this.selectedAsCollection = [...this.selectedValues];
+        this.selectedOption = event.detail.value;
+        this.selectedValue = this.selectedOption;
 
-        // Dispatch Flow Attribute Change Events
-        this.dispatchFlowAttributeChangeEvent('selectedAsString', this.selectedAsString);
-        this.dispatchFlowAttributeChangeEvent('selectedAsCollection', this.selectedAsCollection);
+        // Dispatch Flow Attribute Change Event
+        this.dispatchFlowAttributeChangeEvent('selectedValue', this.selectedValue);
     }
 
     // Dispatch Flow Attribute Change Event
@@ -222,20 +218,16 @@ export default class SuperListBoxLWC extends LightningElement {
             return { isValid: true };
         }
 
-        // If isRequired is true, at least one value must be selected
-        if (this.selectedValues && this.selectedValues.length > 0) {
+        // If isRequired is true, a value must be selected
+        if (this.selectedOption && this.selectedOption.length > 0) {
             return { isValid: true };
         } else {
             return {
                 isValid: false,
-                errorMessage: 'Please select at least one value.'
+                errorMessage: 'Please select a value.'
             };
         }
     }
-
-    // Custom dual listbox functionality
-    @track clickedAvailable = [];
-    @track clickedSelected = [];
 
     get hasCustomDefinitions() {
         const hasDefinitions = this._picklistDefinitions && 
@@ -244,7 +236,7 @@ export default class SuperListBoxLWC extends LightningElement {
                this.picklistOptionsWithHelp && 
                this.picklistOptionsWithHelp.some(opt => opt.hasHelp);
         
-        console.log('SuperListBoxLWC - hasCustomDefinitions:', hasDefinitions, {
+        console.log('SuperComboboxLWC - hasCustomDefinitions:', hasDefinitions, {
             picklistDefinitions: this._picklistDefinitions,
             parsedDefinitions: this.parsedDefinitions,
             hasHelpText: this.picklistOptionsWithHelp?.some(opt => opt.hasHelp)
@@ -253,84 +245,14 @@ export default class SuperListBoxLWC extends LightningElement {
         return hasDefinitions;
     }
 
-    get availableOptions() {
-        if (!this.showCustomUI) return [];
-        return this.picklistOptionsWithHelp.filter(opt => 
-            !this.selectedValues.includes(opt.value)
-        ).map(opt => ({
-            ...opt,
-            selected: this.clickedAvailable.includes(opt.value)
-        }));
-    }
-
-    get selectedOptions() {
-        if (!this.showCustomUI) return [];
-        return this.picklistOptionsWithHelp.filter(opt => 
-            this.selectedValues.includes(opt.value)
-        ).map(opt => ({
-            ...opt,
-            selected: this.clickedSelected.includes(opt.value)
-        }));
-    }
-
-    get disableMoveToSelected() {
-        return this.clickedAvailable.length === 0;
-    }
-
-    get disableMoveToAvailable() {
-        return this.clickedSelected.length === 0;
-    }
-
-    handleAvailableClick(event) {
-        const value = event.currentTarget.dataset.value;
-        const optionElement = event.currentTarget;
+    get currentHelpText() {
+        if (!this.showCustomUI || !this.selectedOption) return '';
         
-        if (this.clickedAvailable.includes(value)) {
-            this.clickedAvailable = this.clickedAvailable.filter(v => v !== value);
-            optionElement.classList.remove('selected');
-        } else {
-            this.clickedAvailable = [...this.clickedAvailable, value];
-            optionElement.classList.add('selected');
-        }
+        const selectedOpt = this.picklistOptionsWithHelp.find(opt => opt.value === this.selectedOption);
+        return selectedOpt?.helpText || '';
     }
 
-    handleSelectedClick(event) {
-        const value = event.currentTarget.dataset.value;
-        const optionElement = event.currentTarget;
-        
-        if (this.clickedSelected.includes(value)) {
-            this.clickedSelected = this.clickedSelected.filter(v => v !== value);
-            optionElement.classList.remove('selected');
-        } else {
-            this.clickedSelected = [...this.clickedSelected, value];
-            optionElement.classList.add('selected');
-        }
-    }
-
-    moveToSelected() {
-        if (this.clickedAvailable.length > 0) {
-            this.selectedValues = [...this.selectedValues, ...this.clickedAvailable];
-            this.clickedAvailable = [];
-            this.updateOutputValues();
-        }
-    }
-
-    moveToAvailable() {
-        if (this.clickedSelected.length > 0) {
-            this.selectedValues = this.selectedValues.filter(v => 
-                !this.clickedSelected.includes(v)
-            );
-            this.clickedSelected = [];
-            this.updateOutputValues();
-        }
-    }
-
-    updateOutputValues() {
-        this.selectedAsString = this.selectedValues.join(';');
-        this.selectedAsCollection = [...this.selectedValues];
-
-        // Dispatch Flow Attribute Change Events
-        this.dispatchFlowAttributeChangeEvent('selectedAsString', this.selectedAsString);
-        this.dispatchFlowAttributeChangeEvent('selectedAsCollection', this.selectedAsCollection);
+    get hasCurrentHelpText() {
+        return !!this.currentHelpText;
     }
 }

@@ -9,10 +9,8 @@
     </targets>
     <targetConfigs>
         <targetConfig targets="lightning__FlowScreen" configurationEditor="c-super-list-box-c-p-e">
-            <propertyType name="T" extends="SObject" label="Object" />
-            
-            <property name="objectApiName" type="{T}" label="Object API Name" />
-            <property name="fieldApiName" type="String" label="Field API Name" role="inputOnly" />
+            <property name="objectApiName" type="String" label="Object API Name" />
+            <property name="fieldApiName" type="String" label="Field API Name" />
             <property name="selectedAsString" type="String" label="Selected Values as String" role="outputOnly" />
             <property name="selectedAsCollection" type="String[]" label="Selected values as String Collection" role="outputOnly" />
             <property name="recordTypeId" type="String" label="RecordTypeID to filter picklist values (Optional)" />

@@ -1,0 +1,42 @@
+<template>
+    <lightning-card>
+        <div class="slds-m-around_medium" key={componentKey}>
+            <template if:false={showCustomUI}>
+                <lightning-combobox
+                    name="combobox"
+                    label={cardTitle}
+                    value={selectedOption}
+                    placeholder={placeholder}
+                    options={picklistOptions}
+                    onchange={handleSelectionChange}
+                    required={isRequired}
+                ></lightning-combobox>
+            </template>
+            
+            <template if:true={showCustomUI}>
+                <div class="slds-form-element">
+                    <lightning-combobox
+                        name="customCombobox"
+                        label={cardTitle}
+                        value={selectedOption}
+                        placeholder={placeholder}
+                        options={picklistOptionsWithHelp}
+                        onchange={handleSelectionChange}
+                        required={isRequired}
+                    ></lightning-combobox>
+                    
+                    <template if:true={hasCurrentHelpText}>
+                        <div class="slds-form-element__help slds-m-top_x-small">
+                            <lightning-icon 
+                                icon-name="utility:info" 
+                                size="x-small"
+                                class="slds-m-right_x-small"
+                            ></lightning-icon>
+                            {currentHelpText}
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

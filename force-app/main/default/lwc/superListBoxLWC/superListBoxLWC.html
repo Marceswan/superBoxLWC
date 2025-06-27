@@ -1,7 +1,7 @@
 <template>
     <lightning-card>
-        <div class="slds-m-around_medium">
-            <template if:false={hasCustomDefinitions}>
+        <div class="slds-m-around_medium" key={componentKey}>
+            <template if:false={showCustomUI}>
                 <lightning-dual-listbox
                         name="dualListbox"
                         onchange={handleSelectionChange}
@@ -13,7 +13,7 @@
                 ></lightning-dual-listbox>
             </template>
             
-            <template if:true={hasCustomDefinitions}>
+            <template if:true={showCustomUI}>
                 <div class="slds-form-element">
                     <label class="slds-form-element__label">{cardTitle}</label>
                     <div class="custom-listbox">
