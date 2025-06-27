@@ -1,0 +1,15 @@
+<template>
+    <lightning-card>
+        <div class="slds-m-around_medium">
+            <lightning-dual-listbox
+                    name="dualListbox"
+                    onchange={handleSelectionChange}
+                    options={picklistOptions}
+                    selected-label="Selected"
+                    source-label="Available"
+                    value={selectedValues}
+                    label={cardTitle}
+            ></lightning-dual-listbox>
+        </div>
+    </lightning-card>
+</template>
