@@ -1,0 +1,85 @@
+<template>
+    <div class="slds-form">
+        <!-- Object Selection -->
+        <div class="slds-form-element slds-m-bottom_small">
+            <lightning-combobox
+                name="object"
+                label="Select Object"
+                value={selectedObject}
+                placeholder="Choose an object"
+                options={objectOptions}
+                onchange={handleObjectChange}
+                required
+            ></lightning-combobox>
+        </div>
+
+        <!-- Field Selection -->
+        <template if:true={selectedObject}>
+            <div class="slds-form-element slds-m-bottom_small">
+                <lightning-combobox
+                    name="field"
+                    label="Select Picklist Field"
+                    value={selectedField}
+                    placeholder="Choose a picklist field"
+                    options={fieldOptions}
+                    onchange={handleFieldChange}
+                    required
+                ></lightning-combobox>
+            </div>
+        </template>
+
+        <!-- Standard Configuration -->
+        <div class="slds-form-element slds-m-bottom_small">
+            <lightning-input
+                label="Card Title"
+                value={cardTitle}
+                onchange={handleCardTitleChange}
+            ></lightning-input>
+        </div>
+
+        <div class="slds-form-element slds-m-bottom_small">
+            <lightning-input
+                label="Record Type ID (Optional)"
+                value={selectedRecordTypeId}
+                onchange={handleRecordTypeIdChange}
+                placeholder="Leave blank for default record type"
+            ></lightning-input>
+        </div>
+
+        <div class="slds-form-element slds-m-bottom_small">
+            <lightning-input
+                type="checkbox"
+                label="Is Required"
+                checked={isRequired}
+                onchange={handleIsRequiredChange}
+            ></lightning-input>
+        </div>
+
+        <!-- Picklist Value Definitions -->
+        <template if:true={showPicklistDefinitions}>
+            <div class="slds-m-top_medium">
+                <h3 class="slds-text-heading_small slds-m-bottom_small">Picklist Value Definitions</h3>
+                <p class="slds-text-body_small slds-m-bottom_small">
+                    Define custom help text for each picklist value. These will appear as tooltips when users hover over the values.
+                </p>
+                
+                <template for:each={picklistValues} for:item="picklistValue">
+                    <div key={picklistValue.value} class="slds-form-element slds-m-bottom_x-small">
+                        <label class="slds-form-element__label">
+                            {picklistValue.label} ({picklistValue.value})
+                        </label>
+                        <div class="slds-form-element__control">
+                            <lightning-textarea
+                                placeholder="Enter help text for this value"
+                                value={picklistValue.definition}
+                                data-value={picklistValue.value}
+                                onchange={handleDefinitionChange}
+                                max-length="500"
+                            ></lightning-textarea>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </template>
+    </div>
+</template>

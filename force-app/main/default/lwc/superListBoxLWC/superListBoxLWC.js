@@ -5,6 +5,7 @@ import { FlowAttributeChangeEvent } from 'lightning/flowSupport';
 export default class SuperListBoxLWC extends LightningElement {
     @api recordTypeId; // Optional Input: Record Type ID
     @api isRequired = false;
+    @api picklistDefinitions; // New Input: Custom definitions for picklist values
 
     _objectApiName;
     @api
@@ -27,14 +28,32 @@ export default class SuperListBoxLWC extends LightningElement {
     }
 
     @api initialSelectedValues; // New Input: Pre-selected values
-    @api selectedAsString; // Output: Selected values as string    @api selectedAsCollection; // Output: Selected values as collection
+    @api selectedAsString; // Output: Selected values as string
+    @api selectedAsCollection; // Output: Selected values as collection
     @api cardTitle = 'Select Values';
 
     @track picklistOptions = []; // Options for dual listbox
     @track selectedValues = []; // Holds the selected values
+    @track picklistOptionsWithHelp = []; // Options with help text
+    @track parsedDefinitions = {}; // Parsed custom definitions
 
     effectiveRecordTypeId = null;
     picklistParams = null;
+
+    connectedCallback() {
+        this.parseDefinitions();
+    }
+
+    parseDefinitions() {
+        if (this.picklistDefinitions) {
+            try {
+                this.parsedDefinitions = JSON.parse(this.picklistDefinitions);
+            } catch (e) {
+                console.error('Error parsing picklist definitions:', e);
+                this.parsedDefinitions = {};
+            }
+        }
+    }
 
     // Fetch object info to get default record type if recordTypeId is not provided
     @wire(getObjectInfo, { objectApiName: '$_objectApiName' })
@@ -67,6 +86,17 @@ export default class SuperListBoxLWC extends LightningElement {
                     return { label: item.label, value: item.value };
                 });
 
+                // Create options with help text
+                this.picklistOptionsWithHelp = fieldData.values.map((item) => {
+                    const helpText = this.parsedDefinitions[item.value];
+                    return { 
+                        label: item.label, 
+                        value: item.value,
+                        helpText: helpText || '',
+                        hasHelp: !!helpText
+                    };
+                });
+
                 // Set selected values if initialSelectedValues are provided
                 if (this.initialSelectedValues && this.initialSelectedValues.length > 0) {
                     this.selectedValues = [...this.initialSelectedValues];
@@ -86,7 +116,8 @@ export default class SuperListBoxLWC extends LightningElement {
         }
     }
 
-    // Handle selection change in the dual listbox    handleSelectionChange(event) {
+    // Handle selection change in the dual listbox
+    handleSelectionChange(event) {
         this.selectedValues = event.detail.value;
         this.selectedAsString = this.selectedValues.join(';');
         this.selectedAsCollection = [...this.selectedValues];
@@ -118,5 +149,94 @@ export default class SuperListBoxLWC extends LightningElement {
                 errorMessage: 'Please select at least one value.'
             };
         }
+    }
+
+    // Custom dual listbox functionality
+    @track clickedAvailable = [];
+    @track clickedSelected = [];
+
+    get hasCustomDefinitions() {
+        return this.picklistDefinitions && Object.keys(this.parsedDefinitions).length > 0;
+    }
+
+    get availableOptions() {
+        if (!this.hasCustomDefinitions) return [];
+        return this.picklistOptionsWithHelp.filter(opt => 
+            !this.selectedValues.includes(opt.value)
+        ).map(opt => ({
+            ...opt,
+            selected: this.clickedAvailable.includes(opt.value)
+        }));
+    }
+
+    get selectedOptions() {
+        if (!this.hasCustomDefinitions) return [];
+        return this.picklistOptionsWithHelp.filter(opt => 
+            this.selectedValues.includes(opt.value)
+        ).map(opt => ({
+            ...opt,
+            selected: this.clickedSelected.includes(opt.value)
+        }));
+    }
+
+    get disableMoveToSelected() {
+        return this.clickedAvailable.length === 0;
+    }
+
+    get disableMoveToAvailable() {
+        return this.clickedSelected.length === 0;
+    }
+
+    handleAvailableClick(event) {
+        const value = event.currentTarget.dataset.value;
+        const optionElement = event.currentTarget;
+        
+        if (this.clickedAvailable.includes(value)) {
+            this.clickedAvailable = this.clickedAvailable.filter(v => v !== value);
+            optionElement.classList.remove('selected');
+        } else {
+            this.clickedAvailable = [...this.clickedAvailable, value];
+            optionElement.classList.add('selected');
+        }
+    }
+
+    handleSelectedClick(event) {
+        const value = event.currentTarget.dataset.value;
+        const optionElement = event.currentTarget;
+        
+        if (this.clickedSelected.includes(value)) {
+            this.clickedSelected = this.clickedSelected.filter(v => v !== value);
+            optionElement.classList.remove('selected');
+        } else {
+            this.clickedSelected = [...this.clickedSelected, value];
+            optionElement.classList.add('selected');
+        }
+    }
+
+    moveToSelected() {
+        if (this.clickedAvailable.length > 0) {
+            this.selectedValues = [...this.selectedValues, ...this.clickedAvailable];
+            this.clickedAvailable = [];
+            this.updateOutputValues();
+        }
+    }
+
+    moveToAvailable() {
+        if (this.clickedSelected.length > 0) {
+            this.selectedValues = this.selectedValues.filter(v => 
+                !this.clickedSelected.includes(v)
+            );
+            this.clickedSelected = [];
+            this.updateOutputValues();
+        }
+    }
+
+    updateOutputValues() {
+        this.selectedAsString = this.selectedValues.join(';');
+        this.selectedAsCollection = [...this.selectedValues];
+
+        // Dispatch Flow Attribute Change Events
+        this.dispatchFlowAttributeChangeEvent('selectedAsString', this.selectedAsString);
+        this.dispatchFlowAttributeChangeEvent('selectedAsCollection', this.selectedAsCollection);
     }
 }

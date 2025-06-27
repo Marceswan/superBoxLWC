@@ -8,15 +8,18 @@
         <target>lightning__FlowScreen</target>
     </targets>
     <targetConfigs>
-        <targetConfig targets="lightning__FlowScreen">
-            <property name="objectApiName" type="String" label="Object API Name" />
-            <property name="fieldApiName" type="String" label="Field API Name" />
-            <property name="selectedAsString" type="String" label="Selected Values as String" />
-            <property name="selectedAsCollection" type="String[]" label="Selected values as String Collection" />
+        <targetConfig targets="lightning__FlowScreen" configurationEditor="c-super-list-box-c-p-e">
+            <propertyType name="T" extends="SObject" label="Object" />
+            
+            <property name="objectApiName" type="{T}" label="Object API Name" />
+            <property name="fieldApiName" type="String" label="Field API Name" role="inputOnly" />
+            <property name="selectedAsString" type="String" label="Selected Values as String" role="outputOnly" />
+            <property name="selectedAsCollection" type="String[]" label="Selected values as String Collection" role="outputOnly" />
             <property name="recordTypeId" type="String" label="RecordTypeID to filter picklist values (Optional)" />
-            <property name="cardTitle" type="String" label="Label" />
-            <property name="isRequired" type="Boolean" label="Is Input Required?" />
+            <property name="cardTitle" type="String" label="Label" default="Select Values" />
+            <property name="isRequired" type="Boolean" label="Is Input Required?" default="false" />
             <property name="initialSelectedValues" type="String[]" label="Initial Selected Values" description="Pass in 'selectedAsCollection' to re-use already selected values." />
+            <property name="picklistDefinitions" type="String" label="Custom Picklist Definitions" description="JSON string containing custom help text for picklist values" />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

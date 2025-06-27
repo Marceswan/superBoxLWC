@@ -1,0 +1,63 @@
+.picklist-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+    width: 100%;
+}
+
+.help-icon {
+    margin-left: 0.5rem;
+    color: #706e6b;
+}
+
+.custom-listbox {
+    display: flex;
+    gap: 1rem;
+}
+
+.listbox-container {
+    flex: 1;
+}
+
+.listbox-header {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.options-list {
+    border: 1px solid #dddbda;
+    border-radius: 0.25rem;
+    min-height: 200px;
+    max-height: 300px;
+    overflow-y: auto;
+    background: white;
+}
+
+.option-item {
+    padding: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.option-item:hover {
+    background-color: #f3f2f2;
+}
+
+.option-item.selected {
+    background-color: #0176d3;
+    color: white;
+}
+
+.option-item.selected .help-icon {
+    color: white;
+}
+
+.move-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+}
