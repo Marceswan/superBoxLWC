@@ -1,18 +1,65 @@
-# Salesforce DX Project: Next Steps
+# superBoxLWC
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+A Salesforce Lightning Web Component (LWC) that provides a dual listbox for selecting picklist values in Flow screens.
 
-## How Do You Plan to Deploy Your Changes?
+## Component Overview
 
-Do you want to deploy a set of changes, or create a self-contained application? Choose a [development model](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models).
+The `superListBoxLWC` is a Flow-enabled Lightning Web Component that allows users to select multiple values from picklist fields dynamically. It's designed to work within Salesforce Flow screens and provides both string and collection outputs.
 
-## Configure Your Salesforce DX Project
+## Features
 
-The `sfdx-project.json` file contains useful configuration information for your project. See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm) in the _Salesforce DX Developer Guide_ for details about this file.
+- **Dynamic Picklist Loading**: Loads picklist values based on object and field API names
+- **Record Type Support**: Filters picklist values by record type (optional)
+- **Pre-selection Support**: Allows initial values to be pre-selected
+- **Dual Output Formats**: Returns selected values as both semicolon-separated string and string collection
+- **Validation**: Built-in validation for required field scenarios
+- **Customizable Label**: Configurable card title for the component
 
-## Read All About It
+## Component Properties
 
-- [Salesforce Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
-- [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_intro.htm)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
+### Input Properties
+- `objectApiName` (String): The API name of the Salesforce object
+- `fieldApiName` (String): The API name of the picklist field
+- `recordTypeId` (String, Optional): Record Type ID to filter picklist values
+- `cardTitle` (String): Label displayed on the component card
+- `isRequired` (Boolean): Whether input is required
+- `initialSelectedValues` (String[]): Pre-selected values
+
+### Output Properties
+- `selectedAsString` (String): Selected values as semicolon-separated string
+- `selectedAsCollection` (String[]): Selected values as string collection
+
+## Installation
+
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/Marceswan/superBoxLWC.git
+   ```
+
+2. Deploy to your Salesforce org:
+   ```bash
+   sf project deploy start
+   ```
+
+## Usage in Flow
+
+1. In Flow Builder, add a Screen element
+2. Drag the "Super List Box LWC" component onto the screen
+3. Configure the required properties:
+   - Set the Object API Name (e.g., "Account")
+   - Set the Field API Name (e.g., "Industry")
+   - Optionally set other properties as needed
+4. Store the output in Flow variables for further processing
+
+## Development
+
+This is a standard SFDX project structure. To work with this component:
+
+1. Ensure you have Salesforce CLI installed
+2. Authorize your org: `sf org login web`
+3. Make changes to the component files in `force-app/main/default/lwc/superListBoxLWC/`
+4. Deploy changes: `sf project deploy start`
+
+## License
+
+This project is licensed under the MIT License.
