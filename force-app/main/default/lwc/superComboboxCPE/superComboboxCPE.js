@@ -323,6 +323,11 @@ export default class SuperComboboxCPE extends LightningElement {
         this.dispatchConfigurationChange('isRequired', this.isRequired);
     }
 
+    handleInitialSelectedValueChange(event) {
+        this.initialSelectedValue = event.detail.value;
+        this.dispatchConfigurationChange('initialSelectedValue', this.initialSelectedValue);
+    }
+
     handleDefinitionChange(event) {
         const picklistValue = event.target.dataset.value;
         const definition = event.detail.value;

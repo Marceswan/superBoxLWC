@@ -316,6 +316,7 @@ export default class SuperListBoxCPE extends LightningElement {
         this.dispatchConfigurationChange('isRequired', this.isRequired);
     }
 
+
     handleDefinitionChange(event) {
         const picklistValue = event.target.dataset.value;
         const definition = event.detail.value;
