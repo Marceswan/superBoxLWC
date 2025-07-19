@@ -35,6 +35,17 @@
                 ></lightning-combobox>
             </div>
 
+            <!-- Initial Selected Value -->
+            <div class="slds-form-element slds-m-bottom_small">
+                <c-fsc_flow-combobox
+                    name="initialSelectedValue"
+                    label="Initial Selected Value"
+                    value={initialSelectedValue}
+                    builder-context={builderContext}
+                    automatic-output-variables={automaticOutputVariables}
+                    onvaluechanged={handleInitialSelectedValueChange}
+                ></c-fsc_flow-combobox>
+            </div>
             
             <!-- Picklist Value Definitions -->
             <template if:true={showPicklistDefinitions}>

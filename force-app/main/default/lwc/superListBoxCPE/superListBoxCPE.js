@@ -8,6 +8,7 @@ export default class SuperListBoxCPE extends LightningElement {
     _builderContext = {};
     _inputVariables = [];
     _genericTypeMappings = [];
+    _automaticOutputVariables = [];
     
     @track objectOptions = [];
     @track fieldOptions = [];
@@ -48,7 +49,8 @@ export default class SuperListBoxCPE extends LightningElement {
                     hasObjectInfos: !!context.objectInfos,
                     hasFlowInfo: !!context.flowInfo,
                     hasElementInfos: !!context.elementInfos,
-                    hasVariables: !!context.variables
+                    hasVariables: !!context.variables,
+                    hasFormulas: !!context.formulas
                 });
             } catch (e) {
                 console.log('Error accessing context properties:', e);
@@ -74,6 +76,15 @@ export default class SuperListBoxCPE extends LightningElement {
     set genericTypeMappings(mappings) {
         this._genericTypeMappings = mappings || [];
         this.initializeGenericType();
+    }
+
+    @api
+    get automaticOutputVariables() {
+        return this._automaticOutputVariables;
+    }
+    set automaticOutputVariables(variables) {
+        this._automaticOutputVariables = variables || [];
+        console.log('automaticOutputVariables set:', this._automaticOutputVariables);
     }
 
     initializeValues() {
@@ -316,6 +327,10 @@ export default class SuperListBoxCPE extends LightningElement {
         this.dispatchConfigurationChange('isRequired', this.isRequired);
     }
 
+    handleInitialSelectedValuesChange(event) {
+        this.initialSelectedValues = event.detail.newValue;
+        this.dispatchConfigurationChange('initialSelectedValues', this.initialSelectedValues);
+    }
 
     handleDefinitionChange(event) {
         const picklistValue = event.target.dataset.value;

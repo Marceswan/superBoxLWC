@@ -8,6 +8,7 @@ export default class SuperComboboxCPE extends LightningElement {
     _builderContext = {};
     _inputVariables = [];
     _genericTypeMappings = [];
+    _automaticOutputVariables = [];
     
     @track objectOptions = [];
     @track fieldOptions = [];
@@ -48,8 +49,22 @@ export default class SuperComboboxCPE extends LightningElement {
                     hasObjectInfos: !!context.objectInfos,
                     hasFlowInfo: !!context.flowInfo,
                     hasElementInfos: !!context.elementInfos,
-                    hasVariables: !!context.variables
+                    hasVariables: !!context.variables,
+                    variablesCount: context.variables ? context.variables.length : 0
                 });
+                
+                // Debug variables in detail
+                if (context.variables && context.variables.length > 0) {
+                    console.log('Available variables:', context.variables);
+                    context.variables.forEach(v => {
+                        console.log('Variable:', {
+                            name: v.name,
+                            dataType: v.dataType,
+                            isCollection: v.isCollection,
+                            objectType: v.objectType
+                        });
+                    });
+                }
             } catch (e) {
                 console.log('Error accessing context properties:', e);
             }
@@ -74,6 +89,15 @@ export default class SuperComboboxCPE extends LightningElement {
     set genericTypeMappings(mappings) {
         this._genericTypeMappings = mappings || [];
         this.initializeGenericType();
+    }
+
+    @api
+    get automaticOutputVariables() {
+        return this._automaticOutputVariables;
+    }
+    set automaticOutputVariables(variables) {
+        this._automaticOutputVariables = variables || [];
+        console.log('automaticOutputVariables set:', this._automaticOutputVariables);
     }
 
     initializeValues() {
@@ -324,7 +348,7 @@ export default class SuperComboboxCPE extends LightningElement {
     }
 
     handleInitialSelectedValueChange(event) {
-        this.initialSelectedValue = event.detail.value;
+        this.initialSelectedValue = event.detail.newValue;
         this.dispatchConfigurationChange('initialSelectedValue', this.initialSelectedValue);
     }
 
