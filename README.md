@@ -122,9 +122,12 @@ force-app/main/default/
 │   ├── superListBoxLWC/          # Multi-select component
 │   ├── superListBoxCPE/          # Multi-select property editor
 │   ├── superComboboxLWC/         # Single-select component
-│   └── superComboboxCPE/         # Single-select property editor
+│   ├── superComboboxCPE/         # Single-select property editor
+│   ├── stringArrayCombobox/      # Collection variable selector
+│   └── stringArrayUtils/         # Utility functions for stringArrayCombobox
 └── classes/
-    └── SuperListBoxController/   # Apex controller for dynamic data
+    ├── SuperListBoxController.cls     # Apex controller for dynamic data
+    └── SuperListBoxControllerTest.cls # Test class with 90%+ coverage
 ```
 
 ### Key Technical Features
@@ -132,6 +135,7 @@ force-app/main/default/
 - **Dynamic Apex**: Controller methods to fetch objects and fields
 - **Reactive Properties**: Real-time updates when configuration changes
 - **Custom UI Rendering**: Switches between standard and enhanced UI based on definitions
+- **Collection Variable Support**: stringArrayCombobox enables Flow collection variable selection
 
 ## Development
 
@@ -165,6 +169,8 @@ sf apex test report --test-run-id <test-run-id>
 1. **Fields not showing**: Ensure the user has access to the object and fields
 2. **Definitions not appearing**: Check that definitions are properly formatted JSON
 3. **CPE not loading**: Verify all components are deployed together
+4. **Collection variable errors**: Ensure stringArrayCombobox and stringArrayUtils are deployed
+5. **Initial values not setting**: Use Flow variable references (e.g., {!variableName}) for collections
 
 ## License
 
