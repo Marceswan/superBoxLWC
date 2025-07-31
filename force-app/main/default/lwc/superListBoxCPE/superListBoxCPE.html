@@ -37,14 +37,17 @@
 
             <!-- Initial Selected Values -->
             <div class="slds-form-element slds-m-bottom_small">
-                <c-fsc_flow-combobox
-                    name="initialSelectedValues"
+                <c-string-array-combobox
                     label="Initial Selected Values"
-                    value={initialSelectedValues}
+                    value={initialSelectedValuesForCombobox}
                     builder-context={builderContext}
                     automatic-output-variables={automaticOutputVariables}
                     onvaluechanged={handleInitialSelectedValuesChange}
-                ></c-fsc_flow-combobox>
+                    field-level-help="Enter comma-separated values or select a Flow variable (collection)"
+                    builder-context-filter-collection-boolean="true"
+                    allow-hard-code-reference="true"
+                    value-data-type="String"
+                ></c-string-array-combobox>
             </div>
             
             <!-- Picklist Value Definitions -->

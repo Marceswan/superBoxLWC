@@ -21,15 +21,10 @@ export default class SuperListBoxLWC extends LightningElement {
             this.updatePicklistOptionsWithHelp();
         }
         
-        // Update UI flag
-        this.showCustomUI = !!(this._picklistDefinitions && 
-                               this.parsedDefinitions && 
-                               Object.keys(this.parsedDefinitions).length > 0);
-        
         // Increment key to force complete re-render
         this.componentKey++;
         
-        console.log('SuperListBoxLWC - Updated showCustomUI:', this.showCustomUI);
+        console.log('SuperListBoxLWC - picklistDefinitions updated');
     }
 
     _objectApiName;
@@ -52,17 +47,62 @@ export default class SuperListBoxLWC extends LightningElement {
         this.updatePicklistParams();
     }
 
-    @api initialSelectedValues; // New Input: Pre-selected values
+    _initialSelectedValues = []; // Internal storage as array
+    @api 
+    get initialSelectedValues() {
+        return this._initialSelectedValues;
+    }
+    set initialSelectedValues(value) {
+        console.log('SuperListBoxLWC - initialSelectedValues setter called with:', value, 'Type:', typeof value);
+        
+        if (!value) {
+            this._initialSelectedValues = [];
+            this.selectedValues = [];
+        } else if (Array.isArray(value)) {
+            this._initialSelectedValues = value;
+            this.selectedValues = [...value];
+        } else if (typeof value === 'string') {
+            // Handle string input (shouldn't happen with String[] type, but be defensive)
+            if (value.includes(',')) {
+                const arr = value.split(',').map(v => v.trim()).filter(v => v);
+                this._initialSelectedValues = arr;
+                this.selectedValues = arr;
+            } else {
+                this._initialSelectedValues = [value];
+                this.selectedValues = [value];
+            }
+        } else {
+            this._initialSelectedValues = [];
+            this.selectedValues = [];
+        }
+        
+        console.log('SuperListBoxLWC - After processing, selectedValues:', this.selectedValues);
+    }
     @api selectedAsString; // Output: Selected values as string
     @api selectedAsCollection; // Output: Selected values as collection
     @api cardTitle = 'Select Values';
 
     @track picklistOptions = []; // Options for dual listbox
-    @track selectedValues = []; // Holds the selected values
+    @track _selectedValues = []; // Internal selected values
     @track picklistOptionsWithHelp = []; // Options with help text
     @track parsedDefinitions = {}; // Parsed custom definitions
     @track componentKey = 0; // Key to force re-render
     @track showCustomUI = false; // Simple flag for UI switching
+
+    // Getter to ensure selectedValues is always an array
+    get selectedValues() {
+        return Array.isArray(this._selectedValues) ? this._selectedValues : [];
+    }
+    
+    set selectedValues(value) {
+        if (Array.isArray(value)) {
+            this._selectedValues = [...value];
+        } else if (typeof value === 'string' && value) {
+            this._selectedValues = value.split(';').filter(v => v && v.trim() !== '');
+        } else {
+            this._selectedValues = [];
+        }
+    }
 
     effectiveRecordTypeId = null;
     @track picklistParams = {};
@@ -72,8 +112,14 @@ export default class SuperListBoxLWC extends LightningElement {
             objectApiName: this._objectApiName,
             fieldApiName: this._fieldApiName,
             picklistDefinitions: this._picklistDefinitions,
-            recordTypeId: this.recordTypeId
+            recordTypeId: this.recordTypeId,
+            initialSelectedValues: this._initialSelectedValues,
+            typeOfInitialSelectedValues: typeof this._initialSelectedValues
         });
+        
+        // selectedValues already set by setter, just log for debugging
+        console.log('SuperListBoxLWC - selectedValues after init:', this.selectedValues);
+        
         this.parseDefinitions();
     }
 
@@ -101,6 +147,11 @@ export default class SuperListBoxLWC extends LightningElement {
                     hasHelp: !!helpText
                 };
             });
+            
+            // Update showCustomUI based on whether we have any help text
+            const hasAnyHelpText = this.picklistOptionsWithHelp.some(opt => opt.hasHelp);
+            this.showCustomUI = hasAnyHelpText;
+            console.log('SuperListBoxLWC - updatePicklistOptionsWithHelp - hasAnyHelpText:', hasAnyHelpText);
         }
     }
 
@@ -171,17 +222,15 @@ export default class SuperListBoxLWC extends LightningElement {
                     };
                 });
                 
-                // Update UI flag after setting options
-                this.showCustomUI = !!(this._picklistDefinitions && 
-                                     this.parsedDefinitions && 
-                                     Object.keys(this.parsedDefinitions).length > 0);
+                // Update UI flag based on whether we have any help text
+                const hasAnyHelpText = this.picklistOptionsWithHelp.some(opt => opt.hasHelp);
+                this.showCustomUI = hasAnyHelpText;
                 
                 console.log('SuperListBoxLWC - picklistOptions:', this.picklistOptions);
                 console.log('SuperListBoxLWC - showCustomUI:', this.showCustomUI);
 
                 // Set selected values if initialSelectedValues are provided
-                if (this.initialSelectedValues && this.initialSelectedValues.length > 0) {
-                    this.selectedValues = [...this.initialSelectedValues];
+                if (this.initialSelectedValues && this.selectedValues.length > 0) {
                     // Update outputs
                     this.selectedAsString = this.selectedValues.join(';');
                     this.selectedAsCollection = [...this.selectedValues];

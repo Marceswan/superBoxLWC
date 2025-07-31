@@ -24,18 +24,65 @@ export default class SuperListBoxCPE extends LightningElement {
     cardTitle = 'Select Values';
     isRequired = false;
     initialSelectedValues = [];
+    _initialSelectedValuesForCombobox = ''; // Private property
+    
+    // Track whether initialSelectedValues is a collection
+    @track initialSelectedValuesIsCollection = true;
+    
+    constructor() {
+        super();
+        // Ensure all arrays are initialized
+        this._inputVariables = [];
+        this._genericTypeMappings = [];
+        this._automaticOutputVariables = [];
+        this.initialSelectedValues = [];
+        this.objectOptions = [];
+        this.fieldOptions = [];
+        this.picklistValues = [];
+        this.customDefinitions = {};
+    }
+    
+    // Getter to ensure we always return a valid string
+    get initialSelectedValuesForCombobox() {
+        // Ensure initialSelectedValues is always an array
+        if (!this.initialSelectedValues) {
+            this.initialSelectedValues = [];
+        }
+        
+        // If the stored combobox value is an array, join it
+        if (Array.isArray(this._initialSelectedValuesForCombobox)) {
+            return this._initialSelectedValuesForCombobox.join(',');
+        }
+        return this._initialSelectedValuesForCombobox || '';
+    }
+    
+    set initialSelectedValuesForCombobox(value) {
+        if (Array.isArray(value)) {
+            this._initialSelectedValuesForCombobox = value.join(',');
+        } else {
+            this._initialSelectedValuesForCombobox = value || '';
+        }
+    }
     
     effectiveRecordTypeId = null;
     _picklistData = null; // Store picklist data from wire
 
     connectedCallback() {
+        // Ensure arrays are initialized before loading
+        if (!this.objectOptions) this.objectOptions = [];
+        if (!this.fieldOptions) this.fieldOptions = [];
+        if (!this.picklistValues) this.picklistValues = [];
+        if (!this.initialSelectedValues) this.initialSelectedValues = [];
+        if (!this.customDefinitions) this.customDefinitions = {};
+        if (!this._automaticOutputVariables) this._automaticOutputVariables = [];
+        
         // Load objects when component is connected
         this.loadObjectOptions();
     }
 
     @api
     get builderContext() {
-        return this._builderContext;
+        return this._builderContext || {};
     }
     set builderContext(context) {
         this._builderContext = context || {};
@@ -62,7 +109,7 @@ export default class SuperListBoxCPE extends LightningElement {
     
     @api
     get inputVariables() {
-        return this._inputVariables;
+        return this._inputVariables || [];
     }
     set inputVariables(variables) {
         this._inputVariables = variables || [];
@@ -71,7 +118,7 @@ export default class SuperListBoxCPE extends LightningElement {
     
     @api
     get genericTypeMappings() {
-        return this._genericTypeMappings;
+        return this._genericTypeMappings || [];
     }
     set genericTypeMappings(mappings) {
         this._genericTypeMappings = mappings || [];
@@ -80,7 +127,7 @@ export default class SuperListBoxCPE extends LightningElement {
 
     @api
     get automaticOutputVariables() {
-        return this._automaticOutputVariables;
+        return this._automaticOutputVariables || [];
     }
     set automaticOutputVariables(variables) {
         this._automaticOutputVariables = variables || [];
@@ -116,7 +163,42 @@ export default class SuperListBoxCPE extends LightningElement {
                         this.isRequired = variable.value === 'true' || variable.value === true;
                         break;
                     case 'initialSelectedValues':
-                        this.initialSelectedValues = variable.value || [];
+                        // Handle various input formats for initialSelectedValues
+                        console.log('CPE - Received initialSelectedValues:', variable.value, 'Type:', typeof variable.value);
+                        
+                        if (!variable.value) {
+                            this.initialSelectedValues = [];
+                            this._initialSelectedValuesForCombobox = '';
+                        } else if (typeof variable.value === 'string') {
+                            // Check if it's a Flow variable reference
+                            if (variable.value.startsWith('{!') && variable.value.endsWith('}')) {
+                                // This is a Flow variable reference - display it as is
+                                this._initialSelectedValuesForCombobox = variable.value;
+                                this.initialSelectedValues = []; // Don't try to process the reference
+                            } else {
+                                // Store the string value for combobox
+                                this._initialSelectedValuesForCombobox = variable.value;
+                                // Split comma-separated values
+                                try {
+                                    this.initialSelectedValues = variable.value.split(',').map(v => v.trim()).filter(v => v);
+                                } catch (e) {
+                                    console.error('Error splitting initial values:', e);
+                                    this.initialSelectedValues = variable.value ? [variable.value] : [];
+                                }
+                            }
+                        } else if (Array.isArray(variable.value)) {
+                            // This is already an array from Flow
+                            this.initialSelectedValues = [...variable.value];
+                            this._initialSelectedValuesForCombobox = variable.value.join(',');
+                        } else {
+                            // Convert other types to string
+                            const stringValue = String(variable.value);
+                            this.initialSelectedValues = [stringValue];
+                            this._initialSelectedValuesForCombobox = stringValue;
+                        }
+                        
+                        console.log('CPE - Processed initialSelectedValues:', this.initialSelectedValues);
+                        console.log('CPE - Processed initialSelectedValuesForCombobox:', this._initialSelectedValuesForCombobox);
                         break;
                     case 'picklistDefinitions':
                         try {
@@ -328,8 +410,43 @@ export default class SuperListBoxCPE extends LightningElement {
     }
 
     handleInitialSelectedValuesChange(event) {
-        this.initialSelectedValues = event.detail.newValue;
-        this.dispatchConfigurationChange('initialSelectedValues', this.initialSelectedValues);
+        // Handle the value from flow combobox - it could be a string, array, or null
+        // stringArrayCombobox sends the value directly in event.detail
+        let value = event.detail;
+        
+        console.log('handleInitialSelectedValuesChange received:', value, 'Type:', typeof value);
+        
+        // Check if it's a Flow variable reference
+        if (typeof value === 'string' && value.startsWith('{!') && value.endsWith('}')) {
+            // This is a Flow variable reference - keep it as is
+            this._initialSelectedValuesForCombobox = value;
+            // For Flow Builder, dispatch the variable reference directly
+            // The Flow Builder will handle resolving this to the actual collection variable
+            this.dispatchConfigurationChange('initialSelectedValues', value);
+            console.log('CPE - Dispatching Flow variable reference:', value);
+        } else if (value === null || value === undefined || value === '') {
+            this.initialSelectedValues = [];
+            this._initialSelectedValuesForCombobox = '';
+            // Empty array for initialSelectedValues
+            this.dispatchConfigurationChange('initialSelectedValues', '');
+        } else if (typeof value === 'string') {
+            // If it's a comma-separated string, keep it as a string
+            // Flow Builder will handle the conversion to array if needed
+            this._initialSelectedValuesForCombobox = value;
+            this.dispatchConfigurationChange('initialSelectedValues', value);
+        } else if (Array.isArray(value)) {
+            // If it's already an array, join it to a comma-separated string
+            this.initialSelectedValues = [...value];
+            const stringValue = value.join(',');
+            this._initialSelectedValuesForCombobox = stringValue;
+            this.dispatchConfigurationChange('initialSelectedValues', stringValue);
+        } else {
+            // Handle other types by converting to string first
+            const stringValue = String(value);
+            this.initialSelectedValues = [stringValue];
+            this._initialSelectedValuesForCombobox = stringValue;
+            this.dispatchConfigurationChange('initialSelectedValues', stringValue);
+        }
     }
 
     handleDefinitionChange(event) {
@@ -384,8 +501,15 @@ export default class SuperListBoxCPE extends LightningElement {
         switch (name) {
             case 'isRequired':
                 return 'Boolean';
-            case 'initialSelectedValues':
             case 'selectedAsCollection':
+                return 'String[]';
+            case 'initialSelectedValues':
+                // Check the current value being used, not the input variable
+                const currentValue = this._initialSelectedValuesForCombobox;
+                if (typeof currentValue === 'string' && currentValue.startsWith('{!') && currentValue.endsWith('}')) {
+                    return 'reference';
+                }
+                // Otherwise return String[] to match the metadata definition
                 return 'String[]';
             default:
                 return 'String';
