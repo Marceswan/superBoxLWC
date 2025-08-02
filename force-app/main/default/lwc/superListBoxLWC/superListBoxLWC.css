@@ -16,22 +16,29 @@
     gap: 1rem;
 }
 
-.listbox-container {
-    flex: 1;
-}
-
 .listbox-header {
-    font-weight: bold;
-    margin-bottom: 0.5rem;
+    font-weight: 600;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #dddbda;
+    background: #f3f2f2;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
 }
 
 .options-list {
-    border: 1px solid #dddbda;
-    border-radius: 0.25rem;
+    /*border: 1px solid #dddbda;*/
+    border-top: none;
     min-height: 200px;
     max-height: 300px;
     overflow-y: auto;
     background: white;
+    position: relative;
 }
 
 .option-item {
@@ -40,6 +47,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    font-style: bold;
+    border-bottom: 1px solid #dddbda;
 }
 
 .option-item:hover {
@@ -60,4 +69,66 @@
     flex-direction: column;
     justify-content: center;
     gap: 0.5rem;
+}
+
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1px solid #dddbda;
+    border-radius: 4px;
+    padding: .25rem 1rem;
+    width: 60%;
+}
+
+.search-icon {
+    color: #706e6b;
+    margin-right: 0.25rem;
+}
+
+.search-field {
+    border: none;
+    outline: none;
+    background: transparent;
+    flex: 1;
+    /* padding: 0.25rem 0; */
+    font-size: 0.875rem;
+    font-family: inherit;
+}
+
+.search-field::placeholder {
+    color: #706e6b;
+}
+
+.listbox-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #dddbda;
+    border-radius: 0.25rem;
+    background: white;
+    overflow: hidden;
+}
+
+.option-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+}
+
+.option-subtitle {
+    font-size: 0.75rem;
+    color: #706e6b;
+    margin-top: 0.125rem;
+    line-height: 1.2;
+}
+
+.option-item.selected .option-subtitle {
+    color: rgba(255, 255, 255, 0.8);
 }

@@ -25,6 +25,7 @@ export default class SuperListBoxCPE extends LightningElement {
     isRequired = false;
     initialSelectedValues = [];
     _initialSelectedValuesForCombobox = ''; // Private property
+    helpTextDisplayMode = 'bubble'; // 'bubble' or 'subtitle'
     
     // Track whether initialSelectedValues is a collection
     @track initialSelectedValuesIsCollection = true;
@@ -66,6 +67,14 @@ export default class SuperListBoxCPE extends LightningElement {
     
     effectiveRecordTypeId = null;
     _picklistData = null; // Store picklist data from wire
+    
+    get isBubbleMode() {
+        return this.helpTextDisplayMode === 'bubble';
+    }
+    
+    get isSubtitleMode() {
+        return this.helpTextDisplayMode === 'subtitle';
+    }
 
     connectedCallback() {
         // Ensure arrays are initialized before loading
@@ -206,6 +215,9 @@ export default class SuperListBoxCPE extends LightningElement {
                         } catch (e) {
                             this.customDefinitions = {};
                         }
+                        break;
+                    case 'helpTextDisplayMode':
+                        this.helpTextDisplayMode = variable.value || 'bubble';
                         break;
                 }
             });
@@ -407,6 +419,16 @@ export default class SuperListBoxCPE extends LightningElement {
     handleIsRequiredChange(event) {
         this.isRequired = event.detail.checked;
         this.dispatchConfigurationChange('isRequired', this.isRequired);
+    }
+    
+    handleBubbleModeClick() {
+        this.helpTextDisplayMode = 'bubble';
+        this.dispatchConfigurationChange('helpTextDisplayMode', this.helpTextDisplayMode);
+    }
+    
+    handleSubtitleModeClick() {
+        this.helpTextDisplayMode = 'subtitle';
+        this.dispatchConfigurationChange('helpTextDisplayMode', this.helpTextDisplayMode);
     }
 
     handleInitialSelectedValuesChange(event) {

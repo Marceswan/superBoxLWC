@@ -18,6 +18,7 @@
             <property name="isRequired" type="Boolean" label="Is Input Required?" default="false" />
             <property name="initialSelectedValues" type="String[]" label="Initial Selected Values" description="Pass in 'selectedAsCollection' to re-use already selected values." default="[]" />
             <property name="picklistDefinitions" type="String" label="Custom Picklist Definitions" description="JSON string containing custom help text for picklist values" />
+            <property name="helpTextDisplayMode" type="String" label="Help Text Display Mode" description="Display mode for help text: bubble or subtitle" default="bubble" />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

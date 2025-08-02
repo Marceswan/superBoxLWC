@@ -5,6 +5,7 @@ import { FlowAttributeChangeEvent } from 'lightning/flowSupport';
 export default class SuperListBoxLWC extends LightningElement {
     @api recordTypeId; // Optional Input: Record Type ID
     @api isRequired = false;
+    @api helpTextDisplayMode = 'bubble'; // 'bubble' or 'subtitle'
     
     _picklistDefinitions;
     @api 
@@ -285,6 +286,10 @@ export default class SuperListBoxLWC extends LightningElement {
     // Custom dual listbox functionality
     @track clickedAvailable = [];
     @track clickedSelected = [];
+    
+    // Search functionality
+    @track availableSearchTerm = '';
+    @track selectedSearchTerm = '';
 
     get hasCustomDefinitions() {
         const hasDefinitions = this._picklistDefinitions && 
@@ -301,24 +306,54 @@ export default class SuperListBoxLWC extends LightningElement {
         
         return hasDefinitions;
     }
+    
+    get showHelpBubble() {
+        return this.helpTextDisplayMode === 'bubble';
+    }
+    
+    get showSubtitle() {
+        return this.helpTextDisplayMode === 'subtitle';
+    }
 
     get availableOptions() {
         if (!this.showCustomUI) return [];
-        return this.picklistOptionsWithHelp.filter(opt => 
-            !this.selectedValues.includes(opt.value)
-        ).map(opt => ({
+        return this.picklistOptionsWithHelp.filter(opt => {
+            // Filter out selected values
+            if (this.selectedValues.includes(opt.value)) return false;
+            
+            // Apply search filter
+            if (this.availableSearchTerm) {
+                const searchTerm = this.availableSearchTerm.toLowerCase();
+                return opt.label.toLowerCase().includes(searchTerm) || 
+                       opt.value.toLowerCase().includes(searchTerm);
+            }
+            
+            return true;
+        }).map(opt => ({
             ...opt,
-            selected: this.clickedAvailable.includes(opt.value)
+            selected: this.clickedAvailable.includes(opt.value),
+            showSubtitle: this.showSubtitle && opt.hasHelp
         }));
     }
 
     get selectedOptions() {
         if (!this.showCustomUI) return [];
-        return this.picklistOptionsWithHelp.filter(opt => 
-            this.selectedValues.includes(opt.value)
-        ).map(opt => ({
+        return this.picklistOptionsWithHelp.filter(opt => {
+            // Filter only selected values
+            if (!this.selectedValues.includes(opt.value)) return false;
+            
+            // Apply search filter
+            if (this.selectedSearchTerm) {
+                const searchTerm = this.selectedSearchTerm.toLowerCase();
+                return opt.label.toLowerCase().includes(searchTerm) || 
+                       opt.value.toLowerCase().includes(searchTerm);
+            }
+            
+            return true;
+        }).map(opt => ({
             ...opt,
-            selected: this.clickedSelected.includes(opt.value)
+            selected: this.clickedSelected.includes(opt.value),
+            showSubtitle: this.showSubtitle && opt.hasHelp
         }));
     }
 
@@ -381,5 +416,18 @@ export default class SuperListBoxLWC extends LightningElement {
         // Dispatch Flow Attribute Change Events
         this.dispatchFlowAttributeChangeEvent('selectedAsString', this.selectedAsString);
         this.dispatchFlowAttributeChangeEvent('selectedAsCollection', this.selectedAsCollection);
+    }
+    
+    // Search handlers
+    handleAvailableSearch(event) {
+        this.availableSearchTerm = event.target.value;
+        // Clear clicked items when searching as they may no longer be visible
+        this.clickedAvailable = [];
+    }
+    
+    handleSelectedSearch(event) {
+        this.selectedSearchTerm = event.target.value;
+        // Clear clicked items when searching as they may no longer be visible
+        this.clickedSelected = [];
     }
 }

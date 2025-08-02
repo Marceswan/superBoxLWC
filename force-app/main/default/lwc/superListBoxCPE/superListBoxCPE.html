@@ -1,3 +1,10 @@
+<!--
+  @description       : 
+  @author            : ChangeMeIn@UserSettingsUnder.SFDoc
+  @group             : 
+  @last modified on  : 08-02-2025
+  @last modified by  : ChangeMeIn@UserSettingsUnder.SFDoc
+-->
 <template>
     <div class="slds-form">
         <!-- Object Selection -->
@@ -57,6 +64,31 @@
                     <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_small">
                         Define custom help text for each picklist value
                     </p>
+                    
+                    <!-- Help Text Display Mode -->
+                    <div class="slds-form-element slds-m-bottom_small">
+                        <label class="slds-form-element__label">Help Text Display Mode</label>
+                        <div class="slds-form-element__control">
+                            <lightning-button-group>
+                                <lightning-button-stateful
+                                    label-when-off="Help Bubble"
+                                    label-when-on="Help Bubble"
+                                    icon-name-when-off="utility:info"
+                                    icon-name-when-on="utility:info"
+                                    selected={isBubbleMode}
+                                    onclick={handleBubbleModeClick}>
+                                </lightning-button-stateful>
+                                <lightning-button-stateful
+                                    label-when-off="Subtitle Text"
+                                    label-when-on="Subtitle Text"
+                                    icon-name-when-off="utility:text"
+                                    icon-name-when-on="utility:text"
+                                    selected={isSubtitleMode}
+                                    onclick={handleSubtitleModeClick}>
+                                </lightning-button-stateful>
+                            </lightning-button-group>
+                        </div>
+                    </div>
                     
                     <div class="slds-box slds-box_x-small slds-theme_shade">
                         <template for:each={picklistValues} for:item="picklistValue">
