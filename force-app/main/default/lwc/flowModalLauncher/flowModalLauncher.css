@@ -1,0 +1,7 @@
+/**
+ * Created by marcswan on 11/2/24.
+ */
+.my-flow-modal .slds-modal__container {
+    width: 80% !important;
+    max-width: 80% !important;
+}

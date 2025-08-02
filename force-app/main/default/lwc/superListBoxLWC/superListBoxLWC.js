@@ -6,8 +6,10 @@ export default class SuperListBoxLWC extends LightningElement {
     @api recordTypeId; // Optional Input: Record Type ID
     @api isRequired = false;
     @api helpTextDisplayMode = 'bubble'; // 'bubble' or 'subtitle'
+    @api enableOptionIcons = false; // Enable/disable option icons
     
     _picklistDefinitions;
+    _picklistIcons;
     @api 
     get picklistDefinitions() {
         return this._picklistDefinitions;
@@ -26,6 +28,26 @@ export default class SuperListBoxLWC extends LightningElement {
         this.componentKey++;
         
         console.log('SuperListBoxLWC - picklistDefinitions updated');
+    }
+    
+    @api
+    get picklistIcons() {
+        return this._picklistIcons;
+    }
+    set picklistIcons(value) {
+        console.log('SuperListBoxLWC - picklistIcons setter called with:', value);
+        this._picklistIcons = value;
+        this.parseIcons();
+        
+        // Update options with icons if we already have picklist options
+        if (this.picklistOptions && this.picklistOptions.length > 0) {
+            this.updatePicklistOptionsWithHelp();
+        }
+        
+        // Increment key to force complete re-render
+        this.componentKey++;
+        
+        console.log('SuperListBoxLWC - picklistIcons updated');
     }
 
     _objectApiName;
@@ -87,6 +109,7 @@ export default class SuperListBoxLWC extends LightningElement {
     @track _selectedValues = []; // Internal selected values
     @track picklistOptionsWithHelp = []; // Options with help text
     @track parsedDefinitions = {}; // Parsed custom definitions
+    @track parsedIcons = {}; // Parsed icon definitions
     @track componentKey = 0; // Key to force re-render
     @track showCustomUI = false; // Simple flag for UI switching
 
@@ -136,16 +159,32 @@ export default class SuperListBoxLWC extends LightningElement {
             this.parsedDefinitions = {};
         }
     }
+    
+    parseIcons() {
+        if (this._picklistIcons) {
+            try {
+                this.parsedIcons = JSON.parse(this._picklistIcons);
+            } catch (e) {
+                console.error('Error parsing picklist icons:', e);
+                this.parsedIcons = {};
+            }
+        } else {
+            this.parsedIcons = {};
+        }
+    }
 
     updatePicklistOptionsWithHelp() {
         if (this.picklistOptions) {
             this.picklistOptionsWithHelp = this.picklistOptions.map((item) => {
                 const helpText = this.parsedDefinitions[item.value];
+                const iconName = this.parsedIcons[item.value];
                 return { 
                     label: item.label, 
                     value: item.value,
                     helpText: helpText || '',
-                    hasHelp: !!helpText
+                    hasHelp: !!helpText,
+                    iconName: iconName || '',
+                    hasIcon: !!iconName && this.enableOptionIcons
                 };
             });
             
@@ -211,15 +250,19 @@ export default class SuperListBoxLWC extends LightningElement {
 
                 // Parse definitions if updated
                 this.parseDefinitions();
+                this.parseIcons();
 
-                // Create options with help text
+                // Create options with help text and icons
                 this.picklistOptionsWithHelp = fieldData.values.map((item) => {
                     const helpText = this.parsedDefinitions[item.value];
+                    const iconName = this.parsedIcons[item.value];
                     return { 
                         label: item.label, 
                         value: item.value,
                         helpText: helpText || '',
-                        hasHelp: !!helpText
+                        hasHelp: !!helpText,
+                        iconName: iconName || '',
+                        hasIcon: !!iconName && this.enableOptionIcons
                     };
                 });
                 
@@ -332,7 +375,8 @@ export default class SuperListBoxLWC extends LightningElement {
         }).map(opt => ({
             ...opt,
             selected: this.clickedAvailable.includes(opt.value),
-            showSubtitle: this.showSubtitle && opt.hasHelp
+            showSubtitle: this.showSubtitle && opt.hasHelp,
+            optionClass: `option-item${opt.hasIcon ? ' has-icon' : ''}`
         }));
     }
 
@@ -353,7 +397,8 @@ export default class SuperListBoxLWC extends LightningElement {
         }).map(opt => ({
             ...opt,
             selected: this.clickedSelected.includes(opt.value),
-            showSubtitle: this.showSubtitle && opt.hasHelp
+            showSubtitle: this.showSubtitle && opt.hasHelp,
+            optionClass: `option-item${opt.hasIcon ? ' has-icon' : ''}`
         }));
     }
 

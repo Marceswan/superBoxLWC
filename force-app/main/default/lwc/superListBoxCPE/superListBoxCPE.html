@@ -76,6 +76,7 @@
                                     icon-name-when-off="utility:info"
                                     icon-name-when-on="utility:info"
                                     selected={isBubbleMode}
+                                    variant={bubbleButtonVariant}
                                     onclick={handleBubbleModeClick}>
                                 </lightning-button-stateful>
                                 <lightning-button-stateful
@@ -84,10 +85,22 @@
                                     icon-name-when-off="utility:text"
                                     icon-name-when-on="utility:text"
                                     selected={isSubtitleMode}
+                                    variant={subtitleButtonVariant}
                                     onclick={handleSubtitleModeClick}>
                                 </lightning-button-stateful>
                             </lightning-button-group>
                         </div>
+                    </div>
+                    
+                    <!-- Enable Option Icons -->
+                    <div class="slds-form-element slds-m-bottom_small">
+                        <lightning-input
+                            type="checkbox"
+                            label="Enable Option Icons"
+                            checked={enableOptionIcons}
+                            onchange={handleEnableOptionIconsChange}
+                            field-level-help="Display icons next to picklist options">
+                        </lightning-input>
                     </div>
                     
                     <div class="slds-box slds-box_x-small slds-theme_shade">
@@ -105,6 +118,31 @@
                                         onchange={handleDefinitionChange}
                                         variant="label-hidden"
                                     ></lightning-input>
+                                    <template if:true={enableOptionIcons}>
+                                        <div class="slds-grid slds-gutters_xx-small slds-m-top_xx-small">
+                                            <div class="slds-col slds-size_10-of-12">
+                                                <lightning-input
+                                                    type="text"
+                                                    placeholder="Icon (e.g. standard:account)"
+                                                    value={picklistValue.icon}
+                                                    data-value={picklistValue.value}
+                                                    onchange={handleIconChange}
+                                                    variant="label-hidden"
+                                                ></lightning-input>
+                                            </div>
+                                            <div class="slds-col slds-size_2-of-12 slds-text-align_right">
+                                                <lightning-button-icon
+                                                    icon-name="utility:palette"
+                                                    alternative-text="Select Icon"
+                                                    title="Select Icon"
+                                                    data-value={picklistValue.value}
+                                                    onclick={handleOpenIconPicker}
+                                                    variant="border-filled"
+                                                    size="medium"
+                                                ></lightning-button-icon>
+                                            </div>
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
                         </template>
@@ -141,4 +179,39 @@
         </div>
 
     </div>
+    
+    <!-- Icon Picker Modal -->
+    <template if:true={showIconPickerModal}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large">
+            <div class="slds-modal__container" style="max-height: 90vh;">
+                <header class="slds-modal__header">
+                    <h2 class="slds-modal__title slds-hyphenate">Select Icon</h2>
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                            title="Close"
+                            onclick={handleCloseIconPicker}>
+                        <lightning-icon icon-name="utility:close"
+                                      alternative-text="close"
+                                      variant="inverse"
+                                      size="small">
+                        </lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" style="height: calc(90vh - 8rem); overflow-y: auto;">
+                    <c-fsc_pick-icon
+                        icon-name={currentIconForPicker}
+                        mode="tab"
+                        oniconselection={handleIconSelection}>
+                    </c-fsc_pick-icon>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning-button
+                        label="Cancel"
+                        onclick={handleCloseIconPicker}>
+                    </lightning-button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
 </template>

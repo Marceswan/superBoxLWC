@@ -14,9 +14,13 @@ export default class SuperListBoxCPE extends LightningElement {
     @track fieldOptions = [];
     @track picklistValues = [];
     @track customDefinitions = {};
+    @track customIcons = {};
     @track showPicklistDefinitions = false;
     @track isLoadingObjects = false;
     @track isLoadingFields = false;
+    @track showIconPickerModal = false;
+    @track currentPicklistValueForIcon = null;
+    @track currentIconForPicker = null;
     
     selectedObject;
     selectedField;
@@ -26,6 +30,7 @@ export default class SuperListBoxCPE extends LightningElement {
     initialSelectedValues = [];
     _initialSelectedValuesForCombobox = ''; // Private property
     helpTextDisplayMode = 'bubble'; // 'bubble' or 'subtitle'
+    enableOptionIcons = false;
     
     // Track whether initialSelectedValues is a collection
     @track initialSelectedValuesIsCollection = true;
@@ -74,6 +79,14 @@ export default class SuperListBoxCPE extends LightningElement {
     
     get isSubtitleMode() {
         return this.helpTextDisplayMode === 'subtitle';
+    }
+    
+    get bubbleButtonVariant() {
+        return this.isBubbleMode ? 'brand' : 'neutral';
+    }
+    
+    get subtitleButtonVariant() {
+        return this.isSubtitleMode ? 'brand' : 'neutral';
     }
 
     connectedCallback() {
@@ -219,6 +232,16 @@ export default class SuperListBoxCPE extends LightningElement {
                     case 'helpTextDisplayMode':
                         this.helpTextDisplayMode = variable.value || 'bubble';
                         break;
+                    case 'picklistIcons':
+                        try {
+                            this.customIcons = JSON.parse(variable.value || '{}');
+                        } catch (e) {
+                            this.customIcons = {};
+                        }
+                        break;
+                    case 'enableOptionIcons':
+                        this.enableOptionIcons = variable.value === 'true' || variable.value === true;
+                        break;
                 }
             });
         }
@@ -360,7 +383,8 @@ export default class SuperListBoxCPE extends LightningElement {
                 this.picklistValues = fieldData.values.map((item) => ({
                     label: item.label,
                     value: item.value,
-                    definition: this.customDefinitions[item.value] || ''
+                    definition: this.customDefinitions[item.value] || '',
+                    icon: this.customIcons[item.value] || ''
                 }));
                 this.showPicklistDefinitions = true;
                 console.log('Loaded picklist values:', this.picklistValues.length);
@@ -429,6 +453,71 @@ export default class SuperListBoxCPE extends LightningElement {
     handleSubtitleModeClick() {
         this.helpTextDisplayMode = 'subtitle';
         this.dispatchConfigurationChange('helpTextDisplayMode', this.helpTextDisplayMode);
+    }
+    
+    handleEnableOptionIconsChange(event) {
+        this.enableOptionIcons = event.detail.checked;
+        this.dispatchConfigurationChange('enableOptionIcons', this.enableOptionIcons);
+    }
+    
+    handleIconChange(event) {
+        const picklistValue = event.target.dataset.value;
+        const icon = event.detail.value;
+        
+        // Update the custom icons
+        this.customIcons[picklistValue] = icon;
+        
+        // Update the picklist values array to trigger re-render
+        this.picklistValues = this.picklistValues.map(item => {
+            if (item.value === picklistValue) {
+                return { ...item, icon: icon };
+            }
+            return item;
+        });
+        
+        // Dispatch immediately
+        const iconsJson = JSON.stringify(this.customIcons);
+        console.log('CPE - Dispatching picklistIcons:', iconsJson);
+        this.dispatchConfigurationChange('picklistIcons', iconsJson);
+    }
+    
+    handleOpenIconPicker(event) {
+        this.currentPicklistValueForIcon = event.target.dataset.value;
+        // Get the current icon for this picklist value
+        this.currentIconForPicker = this.customIcons[this.currentPicklistValueForIcon] || '';
+        this.showIconPickerModal = true;
+    }
+    
+    handleCloseIconPicker() {
+        this.showIconPickerModal = false;
+        this.currentPicklistValueForIcon = null;
+        this.currentIconForPicker = null;
+    }
+    
+    handleIconSelection(event) {
+        // The fsc_pickIcon component dispatches an event with the selected icon
+        const selectedIcon = event.detail.value || event.detail;
+        
+        if (this.currentPicklistValueForIcon && selectedIcon) {
+            // Update the custom icons
+            this.customIcons[this.currentPicklistValueForIcon] = selectedIcon;
+            
+            // Update the picklist values array to trigger re-render
+            this.picklistValues = this.picklistValues.map(item => {
+                if (item.value === this.currentPicklistValueForIcon) {
+                    return { ...item, icon: selectedIcon };
+                }
+                return item;
+            });
+            
+            // Dispatch the update
+            const iconsJson = JSON.stringify(this.customIcons);
+            console.log('CPE - Dispatching picklistIcons from picker:', iconsJson);
+            this.dispatchConfigurationChange('picklistIcons', iconsJson);
+        }
+        
+        // Close the modal
+        this.handleCloseIconPicker();
     }
 
     handleInitialSelectedValuesChange(event) {
@@ -522,6 +611,7 @@ export default class SuperListBoxCPE extends LightningElement {
     getDataType(name) {
         switch (name) {
             case 'isRequired':
+            case 'enableOptionIcons':
                 return 'Boolean';
             case 'selectedAsCollection':
                 return 'String[]';

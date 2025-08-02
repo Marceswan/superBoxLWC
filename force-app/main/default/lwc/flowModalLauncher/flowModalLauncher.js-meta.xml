@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>58.0</apiVersion>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__FlowScreen</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__FlowScreen">
+            <property name="flowName" type="String" required="true" description="API Name of the Flow to launch"/>
+            <property name="label" type="String" required="true" label="Button Label" default="Add Contact" description="Button Label"/>
+            <property name="inputVars" type="String" required="false" description="Input variable to pass to the Flow. Format: PropertyName::PropertyValue;Property2Name::Property2Value"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

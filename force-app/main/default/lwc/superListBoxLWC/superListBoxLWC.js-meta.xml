@@ -19,6 +19,8 @@
             <property name="initialSelectedValues" type="String[]" label="Initial Selected Values" description="Pass in 'selectedAsCollection' to re-use already selected values." default="[]" />
             <property name="picklistDefinitions" type="String" label="Custom Picklist Definitions" description="JSON string containing custom help text for picklist values" />
             <property name="helpTextDisplayMode" type="String" label="Help Text Display Mode" description="Display mode for help text: bubble or subtitle" default="bubble" />
+            <property name="picklistIcons" type="String" label="Custom Picklist Icons" description="JSON string containing icon mappings for picklist values" />
+            <property name="enableOptionIcons" type="Boolean" label="Enable Option Icons" description="Show icons next to picklist options" default="false" />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>

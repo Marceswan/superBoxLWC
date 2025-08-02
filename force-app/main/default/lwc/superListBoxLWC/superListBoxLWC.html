@@ -41,24 +41,37 @@
                             <div class="options-list">
                                 <template for:each={availableOptions} for:item="option">
                                     <div key={option.value} 
-                                         class="option-item" 
+                                         class={option.optionClass}
                                          data-value={option.value}
                                          onclick={handleAvailableClick}>
                                         <div class="option-content">
-                                            <template if:true={option.showSubtitle}><span class="option-label"><strong>{option.label}</strong></span></template>
-                                            <template if:true={showHelpBubble}><span class="option-label">{option.label}</span></template>
-                                            <template if:true={option.hasHelp}>
-                                                <template if:true={showHelpBubble}>
-                                                    <lightning-helptext 
-                                                        content={option.helpText}
-                                                        icon-name="utility:info"
-                                                        class="help-icon">
-                                                    </lightning-helptext>
+                                            <template if:true={option.hasIcon}>
+                                                <span class="slds-icon_container slds-icon_container_circle" title={option.iconName}>
+                                                    <lightning-icon 
+                                                        icon-name={option.iconName}
+                                                        size="small"
+                                                        class="option-icon">
+                                                    </lightning-icon>
+                                                </span>
+                                            </template>
+                                            <div class="option-text-wrapper">
+                                                <div class="option-main">
+                                                    <template if:true={option.showSubtitle}><span class="option-label"><strong>{option.label}</strong></span></template>
+                                                    <template if:true={showHelpBubble}><span class="option-label">{option.label}</span></template>
+                                                    <template if:true={option.hasHelp}>
+                                                        <template if:true={showHelpBubble}>
+                                                            <lightning-helptext 
+                                                                content={option.helpText}
+                                                                icon-name="utility:info"
+                                                                class="help-icon">
+                                                            </lightning-helptext>
+                                                        </template>
+                                                    </template>
+                                                </div>
+                                                <template if:true={option.showSubtitle}>
+                                                    <span class="option-subtitle">{option.helpText}</span>
                                                 </template>
-                                            </template>
-                                            <template if:true={option.showSubtitle}>
-                                                <span class="option-subtitle">{option.helpText}</span>
-                                            </template>
+                                            </div>
                                         </div>
                                     </div>
                                 </template>
@@ -91,24 +104,37 @@
                             <div class="options-list">
                                 <template for:each={selectedOptions} for:item="option">
                                     <div key={option.value} 
-                                         class="option-item" 
+                                         class={option.optionClass}
                                          data-value={option.value}
                                          onclick={handleSelectedClick}>
                                         <div class="option-content">
-                                            <template if:true={option.showSubtitle}><span class="option-label"><strong>{option.label}</strong></span></template>
-                                            <template if:true={showHelpBubble}><span class="option-label">{option.label}</span></template>
-                                            <template if:true={option.hasHelp}>
-                                                <template if:true={showHelpBubble}>
-                                                    <lightning-helptext 
-                                                        content={option.helpText}
-                                                        icon-name="utility:info"
-                                                        class="help-icon">
-                                                    </lightning-helptext>
+                                            <template if:true={option.hasIcon}>
+                                                <span class="slds-icon_container slds-icon_container_circle" title={option.iconName}>
+                                                    <lightning-icon 
+                                                        icon-name={option.iconName}
+                                                        size="small"
+                                                        class="option-icon">
+                                                    </lightning-icon>
+                                                </span>
+                                            </template>
+                                            <div class="option-text-wrapper">
+                                                <div class="option-main">
+                                                    <template if:true={option.showSubtitle}><span class="option-label"><strong>{option.label}</strong></span></template>
+                                                    <template if:true={showHelpBubble}><span class="option-label">{option.label}</span></template>
+                                                    <template if:true={option.hasHelp}>
+                                                        <template if:true={showHelpBubble}>
+                                                            <lightning-helptext 
+                                                                content={option.helpText}
+                                                                icon-name="utility:info"
+                                                                class="help-icon">
+                                                            </lightning-helptext>
+                                                        </template>
+                                                    </template>
+                                                </div>
+                                                <template if:true={option.showSubtitle}>
+                                                    <span class="option-subtitle">{option.helpText}</span>
                                                 </template>
-                                            </template>
-                                            <template if:true={option.showSubtitle}>
-                                                <span class="option-subtitle">{option.helpText}</span>
-                                            </template>
+                                            </div>
                                         </div>
                                     </div>
                                 </template>

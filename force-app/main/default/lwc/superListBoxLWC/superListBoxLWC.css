@@ -113,13 +113,42 @@
 
 .option-content {
     display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex: 1;
+    gap: 0.75rem;
+}
+
+.option-text-wrapper {
+    display: flex;
     flex-direction: column;
     flex: 1;
+}
+
+.option-main {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.option-icon {
+    flex-shrink: 0;
+}
+
+.slds-icon_container_circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
 }
 
 .option-label {
     display: flex;
     align-items: center;
+    flex: 1;
 }
 
 .option-subtitle {
@@ -128,6 +157,7 @@
     margin-top: 0.125rem;
     line-height: 1.2;
 }
+
 
 .option-item.selected .option-subtitle {
     color: rgba(255, 255, 255, 0.8);

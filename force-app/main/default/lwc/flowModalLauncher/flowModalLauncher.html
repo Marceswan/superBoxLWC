@@ -1,0 +1,36 @@
+<!--
+ - Created by marcswan on 11/2/24.
+ -->
+
+<!-- Flow Modal Launcher -->
+<template>
+  <lightning-button
+    variant="brand"
+    label={label}
+    onclick={handleClick}>
+  </lightning-button>
+
+  <template if:true={isModalOpen}>
+    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large">
+      <div class="slds-modal__container">
+        <header class="slds-modal__header">
+          <lightning-button-icon
+            icon-name="utility:close"
+            onclick={closeModal}
+            alternative-text="Close"
+            variant="bare-inverse"
+            class="slds-modal__close slds-align_absolute-center">
+          </lightning-button-icon>
+        </header>
+        <div class="slds-modal__content slds-p-around_medium">
+          <lightning-flow
+            flow-api-name={flowName}
+            flow-input-variables={inputVariables}
+            onstatuschange={handleStatusChange}>
+          </lightning-flow>
+        </div>
+      </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+  </template>
+</template>
