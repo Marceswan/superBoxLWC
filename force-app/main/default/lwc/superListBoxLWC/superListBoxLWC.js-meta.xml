@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
-    <apiVersion>61.0</apiVersion>
+    <apiVersion>65.0</apiVersion>
     <description>Simple Dual-Listbox Flow Screen LWC</description>
     <isExposed>true</isExposed>
     <masterLabel>Super List Box LWC</masterLabel>
@@ -8,19 +8,82 @@
         <target>lightning__FlowScreen</target>
     </targets>
     <targetConfigs>
-        <targetConfig targets="lightning__FlowScreen" configurationEditor="c-super-list-box-c-p-e">
-            <property name="objectApiName" type="String" label="Object API Name" />
-            <property name="fieldApiName" type="String" label="Field API Name" />
-            <property name="selectedAsString" type="String" label="Selected Values as String" role="outputOnly" />
-            <property name="selectedAsCollection" type="String[]" label="Selected values as String Collection" role="outputOnly" />
-            <property name="recordTypeId" type="String" label="RecordTypeID to filter picklist values (Optional)" />
-            <property name="cardTitle" type="String" label="Label" default="Select Values" />
-            <property name="isRequired" type="Boolean" label="Is Input Required?" default="false" />
-            <property name="initialSelectedValues" type="String[]" label="Initial Selected Values" description="Pass in 'selectedAsCollection' to re-use already selected values." default="[]" />
-            <property name="picklistDefinitions" type="String" label="Custom Picklist Definitions" description="JSON string containing custom help text for picklist values" />
-            <property name="helpTextDisplayMode" type="String" label="Help Text Display Mode" description="Display mode for help text: bubble or subtitle" default="bubble" />
-            <property name="picklistIcons" type="String" label="Custom Picklist Icons" description="JSON string containing icon mappings for picklist values" />
-            <property name="enableOptionIcons" type="Boolean" label="Enable Option Icons" description="Show icons next to picklist options" default="false" />
+        <targetConfig
+      targets="lightning__FlowScreen"
+      configurationEditor="c-super-list-box-c-p-e"
+    >
+            <property
+        name="objectApiName"
+        type="String"
+        label="Object API Name"
+      />
+            <property
+        name="fieldApiName"
+        type="String"
+        label="Field API Name"
+      />
+            <property
+        name="selectedAsString"
+        type="String"
+        label="Selected Values as String"
+        role="outputOnly"
+      />
+            <property
+        name="selectedAsCollection"
+        type="String[]"
+        label="Selected values as String Collection"
+        role="outputOnly"
+      />
+            <property
+        name="recordTypeId"
+        type="String"
+        label="RecordTypeID to filter picklist values (Optional)"
+      />
+            <property
+        name="cardTitle"
+        type="String"
+        label="Label"
+        default="Select Values"
+      />
+            <property
+        name="isRequired"
+        type="Boolean"
+        label="Is Input Required?"
+        default="false"
+      />
+            <property
+        name="initialSelectedValues"
+        type="String[]"
+        label="Initial Selected Values"
+        description="Pass in 'selectedAsCollection' to re-use already selected values."
+        default="[]"
+      />
+            <property
+        name="picklistDefinitions"
+        type="String"
+        label="Custom Picklist Definitions"
+        description="JSON string containing custom help text for picklist values"
+      />
+            <property
+        name="helpTextDisplayMode"
+        type="String"
+        label="Help Text Display Mode"
+        description="Display mode for help text: bubble or subtitle"
+        default="bubble"
+      />
+            <property
+        name="picklistIcons"
+        type="String"
+        label="Custom Picklist Icons"
+        description="JSON string containing icon mappings for picklist values"
+      />
+            <property
+        name="enableOptionIcons"
+        type="Boolean"
+        label="Enable Option Icons"
+        description="Show icons next to picklist options"
+        default="false"
+      />
         </targetConfig>
     </targetConfigs>
 </LightningComponentBundle>
